@@ -107,6 +107,11 @@ extern volatile int ZirconModuleAnchorSource;
 static int LLVM_ATTRIBUTE_UNUSED ZirconModuleAnchorDestination =
     ZirconModuleAnchorSource;
 
+// This anchor is used to force the linker to link the SmellsModule.
+extern volatile int SmellsModuleAnchorSource;
+static int LLVM_ATTRIBUTE_UNUSED SmellsModuleAnchorDestination =
+    SmellsModuleAnchorSource;
+
 } // namespace tidy
 } // namespace clang
 

@@ -92,6 +92,14 @@ Improvements to clang-tidy
   Checks whether there are underscores in googletest test and test case names in
   test macros, which is prohibited by the Googletest FAQ.
 
+- New :doc:`smells-data-clump
+  <clang-tidy/checks/smells-data-clump>`
+  check.
+
+  Checks whether there might be data clumps in functions based on matching the
+  parameters of a function with the arguments passed to method calls inside that
+  function.
+
 - The :doc:`bugprone-argument-comment
   <clang-tidy/checks/bugprone-argument-comment>` now supports
   `CommentBoolLiterals`, `CommentIntegerLiterals`,  `CommentFloatLiterals`,

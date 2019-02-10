@@ -269,4 +269,5 @@ Clang-Tidy Checks
    readability-string-compare
    readability-uniqueptr-delete-release
    readability-uppercase-literal-suffix
+   smells-data-clump
    zircon-temporary-objects
