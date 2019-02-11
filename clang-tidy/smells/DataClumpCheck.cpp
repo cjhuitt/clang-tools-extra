@@ -40,9 +40,6 @@ void DataClumpCheck::check(const MatchFinder::MatchResult &Result) {
         function_loc = func->getLocation();
         auto params = func->parameters();
 
-//        diag(function_loc, "Checking " +
-//            func->getQualifiedNameAsString() + " at B");
-
         for ( const auto call : findCalls(func->getBody()) )
         {
             if ( call->getNumArgs() < 2 ) continue;
@@ -50,13 +47,10 @@ void DataClumpCheck::check(const MatchFinder::MatchResult &Result) {
             Match match;
             match.call = call;
 
-//            diag(call->getBeginLoc(), "Checking function " +
-//                call->getDirectCallee()->getQualifiedNameAsString());
             for ( const auto arg : findNamedArgs( call ) )
             {
                 const auto decl = arg->getFoundDecl();
                 const auto name = decl->getQualifiedNameAsString();
-//                diag(arg->getBeginLoc(), "Checking argument " + name);
 
                 auto pred = [name]( const ParmVarDecl* param ) -> bool {
                     return name == param->getQualifiedNameAsString();
@@ -106,8 +100,12 @@ void DataClumpCheck::check(const MatchFinder::MatchResult &Result) {
                 }
             }
             auto parms = join( param_names );
+            auto name = match.call->getDirectCallee() ?
+                match.call->getDirectCallee()->getQualifiedNameAsString() :
+                "foo";
+
             diag(match.call->getBeginLoc(), parms + " passed directly to " +
-                match.call->getDirectCallee()->getQualifiedNameAsString());
+                name);
         }
     }
 }
@@ -115,13 +113,15 @@ void DataClumpCheck::check(const MatchFinder::MatchResult &Result) {
 std::vector<const CallExpr*> DataClumpCheck::findCalls(const Stmt *statement)
 {
     std::vector<const CallExpr*> calls;
+//    if ( !statement ) return calls;
+
     for ( const auto child : statement->children() )
     {
-        if( isa<CallExpr>( child ) )
+        if( child && isa<CallExpr>( child ) )
         {
             calls.emplace_back( cast<CallExpr>(child) );
         }
-        else
+        else if (child)
         {
             auto subcalls = findCalls( child );
             calls.insert( calls.end(), subcalls.begin(), subcalls.end());
@@ -137,7 +137,7 @@ std::vector<const DeclRefExpr*> DataClumpCheck::findNamedArgs(const CallExpr *ca
     for ( const auto arg : call->arguments() )
     {
         const auto fixed = arg->IgnoreImplicit();
-        if( isa<DeclRefExpr>( fixed ) )
+        if( fixed && isa<DeclRefExpr>( fixed ) )
         {
             args.emplace_back( cast<DeclRefExpr>( fixed ) );
         }
